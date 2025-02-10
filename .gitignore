@@ -1,0 +1,38 @@
+# 👉 Recommended .gitignore for Go Projects
+
+# Binaries and Executables
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.o
+*.a
+*.test
+
+# Go-Specific Build Artifacts
+/bin/
+/pkg/
+/cover.out
+
+# Dependency Directories (Uncomment if needed)
+# /vendor/
+
+# Go Modules Files
+go.sum
+go.work
+go.work.sum
+
+# Environment Variables
+.env
+
+# Logs and Temporary Files
+*.log
+*.tmp
+
+# Editor & OS-Specific Files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
