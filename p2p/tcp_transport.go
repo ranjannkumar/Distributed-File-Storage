@@ -35,6 +35,8 @@ type TCPTransportOpts struct{
 	Onpeer        func(Peer)error
 }
   
+//A TCPTransport is responsible for managing the overall TCP transport layer, including listening for connections, accepting connections, and handling peer communication.
+//the TCPTransport creates the connections, and the TCPPeer represents those individual connections.
 type TCPTransport struct {
 	TCPTransportOpts
 	listener      net.Listener
@@ -42,7 +44,6 @@ type TCPTransport struct {
 
 	mu     sync.RWMutex
 }
-
 
 func NewTCPTransport(opts TCPTransportOpts)*TCPTransport{
 	return &TCPTransport{
@@ -107,6 +108,7 @@ func (t *TCPTransport) handleConn(conn net.Conn){
 				return
 			}
 			rpc.From = conn.RemoteAddr()
+			//This line sends the decoded rpc message into the rpcch channel.
 			t.rpcch <- rpc
 		}
 }   
