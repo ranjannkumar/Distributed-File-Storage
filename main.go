@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"github.com/ranjannkumar/distributedFileStorage/p2p"
 )
@@ -23,14 +22,15 @@ func main() {
 		StorageRoot:        "4000_network",
 		PathTransFormFunc:  CASPathTransformFunc,
 		Transport:          tcpTransport,
+		BootstrapNodes:      []string{":6000"},
 	}
 
 	s := NewFileServer(fileServerOpts)
 
-	go func(){
-		time.Sleep(time.Second*3)
-		s.Stop()
-	}()
+	// go func(){
+	// 	time.Sleep(time.Second*3)
+	// 	s.Stop()
+	// }()
 
 	if err:= s.Start();err!=nil{
 		log.Fatal(err)
@@ -38,4 +38,4 @@ func main() {
 
 }
 
-//3"04:34
+//4:12:23
