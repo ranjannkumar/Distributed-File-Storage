@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 
 	"github.com/ranjannkumar/distributedFileStorage/p2p"
@@ -39,6 +40,10 @@ func main() {
 	}()
 
 	s2.Start()
+
+	data := bytes.NewReader([]byte("my big data file here!")) 
+
+	s2.StoreData("myprivatedata",data)
 }
 
-//4:12:23
+//4:43:23
