@@ -95,13 +95,13 @@ func (s *Store)Clear()error{
 
 func (s *Store)Delete(key string)error{
 	pathKey := s.PathTransFormFunc(key)
+	rootPathWithColon := strings.Split(s.Root, ":")
+	rootDir := rootPathWithColon[1]
 
 	defer func(){
 		log.Printf("deleted [%s] from disk",pathKey.Filename)
 	}()
-	firstPathNameWithRoot := fmt.Sprintf("%s/%s",s.Root,pathKey.FirstPathName())
-
-
+	firstPathNameWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.FirstPathName())
 	return os.RemoveAll(firstPathNameWithRoot)
 }
 
@@ -130,12 +130,14 @@ func (s *Store)readStream(key string)(io.ReadCloser,error){
 
 func (s *Store) writeStream(key string, r io.Reader)error{
 			pathKey:= s.PathTransFormFunc(key)
-			pathNameWithRoot := fmt.Sprintf("%s/%s",s.Root,pathKey.PathName)
+			rootPathWithColon := strings.Split(s.Root, ":")
+			rootDir := rootPathWithColon[1]
+			pathNameWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.PathName)
 			if err := os.MkdirAll(pathNameWithRoot,os.ModePerm);err!=nil{
 				return err
 			}
 
-			fullPathWithRoot:= fmt.Sprintf("%s/%s",s.Root,pathKey.FullPath())
+			fullPathWithRoot:= fmt.Sprintf("%s/%s",rootDir,pathKey.FullPath())
 
 			f,err := os.Create(fullPathWithRoot)
 			if err!=nil{
