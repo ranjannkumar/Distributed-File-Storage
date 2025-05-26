@@ -82,7 +82,9 @@ func NewStore(opts StoreOpts) *Store {
 
 func (s *Store) Has(key string)bool{
 	pathKey := s.PathTransFormFunc(key)
-	fullPathWithRoot := fmt.Sprintf("%s/%s",s.Root,pathKey.FullPath())
+	rootPathWithColon := strings.Split(s.Root, ":")
+	rootDir := rootPathWithColon[1]
+	fullPathWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.FullPath())
 
 	_,err := os.Stat(fullPathWithRoot)
 	return !errors.Is(err,os.ErrNotExist)
@@ -124,7 +126,9 @@ func (s *Store) Read(key string)(io.Reader,error){
 
 func (s *Store)readStream(key string)(io.ReadCloser,error){
 	pathKey := s.PathTransFormFunc(key)
-	fullPathWithRoot := fmt.Sprintf("%s/%s",s.Root,pathKey.FullPath())
+	rootPathWithColon := strings.Split(s.Root, ":")
+	rootDir := rootPathWithColon[1]
+	fullPathWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.FullPath())
 	return os.Open(fullPathWithRoot)
 }
 
@@ -149,5 +153,6 @@ func (s *Store) writeStream(key string, r io.Reader)(int64,error){
 			if err!=nil{
 				return 0,err
 			}
+			log.Printf("written (%d) bytes to disk: %s",n,fullPathWithRoot)
 			return n,nil
 }
