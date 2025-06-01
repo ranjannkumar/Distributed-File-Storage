@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"time"
 
@@ -35,35 +37,46 @@ func makeServer(ListenAddr string,nodes ...string)*FileServer{
 
 func main() {
 	s1 := makeServer(":3000","")
-	s2 := makeServer(":4000",":3000")
+	s2 := makeServer(":7000","")
+	s3 := makeServer(":5000",":3000",":7000")
 
 	go func() {
 		log.Fatal(s1.Start())
 	}()
+		time.Sleep(time.Millisecond * 500)
+		go func() {
+		log.Fatal(s2.Start())
+	}()
+
 
 	time.Sleep(2*time.Second)
 
-	go s2.Start()
+	go s3.Start()
 	time.Sleep(2*time.Second)
-
+  
+ for i:=0;i<20;i++{
+		key:=fmt.Sprintf("picture_%d.png",i)
 		data := bytes.NewReader([]byte("my big data file here!")) 
-	  s2.Store("coolPicture.jpg",data)
-	
+		s3.Store(key,data)
 
-	// r,err := s2.Get("coolPicture.jpg")
-	// if err !=nil{
-	// 	log.Fatal(err)
-	// }
+		if err := s3.store.Delete(key);err!=nil{
+			log.Fatal(err)
+		}
+		
+		r,err := s3.Get(key)
+		if err !=nil{
+			log.Fatal(err)
+		}
 
-	// b,err := ioutil.ReadAll(r)
-	// if err !=nil{
-	// 	log.Fatal(err)
-	// }
+		b,err := ioutil.ReadAll(r)
+		if err !=nil{
+			log.Fatal(err)
+		}
 
-	// fmt.Println(string(b))
-
+		fmt.Println(string(b))
+  }
 }
 
-//8:37:34
+
 
 

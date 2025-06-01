@@ -110,6 +110,56 @@ func (s *Store)Write(key string,r io.Reader)(int64,error){
 	return s.writeStream(key,r)
 }
 
+
+func (s *Store) WriteDecrypt(encKey []byte,key string, r io.Reader)(int64,error){
+			f,err := s.openFileForWriting(key)
+			if err !=nil{
+				return  0,err
+			}
+			//defer
+			defer func() {
+        if closeErr := f.Close(); closeErr != nil {
+            log.Printf("Error closing decrypted file %s: %v", key, closeErr)
+        }
+    }()
+
+			n,err := copyDecrypt(encKey,r,f)
+			return int64(n),err
+			
+}
+
+func (s *Store)openFileForWriting(key string)(*os.File,error){
+	pathKey:= s.PathTransFormFunc(key)
+			rootPathWithColon := strings.Split(s.Root, ":")
+			rootDir := rootPathWithColon[1]
+			pathNameWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.PathName)
+			if err := os.MkdirAll(pathNameWithRoot,os.ModePerm);err!=nil{
+				return nil,err
+			}
+
+			fullPathWithRoot:= fmt.Sprintf("%s/%s",rootDir,pathKey.FullPath())
+
+			return os.Create(fullPathWithRoot)
+
+}
+
+func (s *Store) writeStream(key string, r io.Reader)(int64,error){
+			f,err := s.openFileForWriting(key)
+			if err!=nil{
+				return 0,err
+			}
+
+			//defer
+			defer func() {
+        if closeErr := f.Close(); closeErr != nil {
+            log.Printf("Error closing file %s: %v", key, closeErr)
+        }
+    }()
+
+			return io.Copy(f,r)
+			
+}
+
 func (s *Store) Read(key string)(int64, io.Reader, error){
 	return s.readStream(key)
 }
@@ -132,27 +182,3 @@ func (s *Store)readStream(key string)(int64, io.ReadCloser,error){
 	return fi.Size(),file,nil
 }
 
-func (s *Store) writeStream(key string, r io.Reader)(int64,error){
-			pathKey:= s.PathTransFormFunc(key)
-			rootPathWithColon := strings.Split(s.Root, ":")
-			rootDir := rootPathWithColon[1]
-			pathNameWithRoot := fmt.Sprintf("%s/%s",rootDir,pathKey.PathName)
-			if err := os.MkdirAll(pathNameWithRoot,os.ModePerm);err!=nil{
-				return 0,err
-			}
-
-			fullPathWithRoot:= fmt.Sprintf("%s/%s",rootDir,pathKey.FullPath())
-
-			f,err := os.Create(fullPathWithRoot)
-			if err!=nil{
-				return 0,err
-			}
-			defer f.Close()
-
-			n,err := io.Copy(f,r)
-			if err!=nil{
-				return 0,err
-			}
-			// log.Printf("written (%d) bytes to disk: %s",n,fullPathWithRoot)
-			return n,nil
-}
