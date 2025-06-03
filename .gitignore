@@ -24,15 +24,15 @@ go.work
 go.work.sum
 
 # Environment Variables
-.env
 
 # Logs and Temporary Files
 *.log
 *.tmp
 
 # Editor & OS-Specific Files
-.vscode/
 .idea/
 .DS_Store
 *.swp
 *.swo
+config.bat
+node_modules
